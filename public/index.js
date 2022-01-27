@@ -14,6 +14,7 @@ let predictions = [];
 
 let indextip;
 let thumbtip;
+let dist;
 
 let lastXPosition = 100;
 let lastYPosition = 100;
@@ -142,7 +143,10 @@ function findFingers (){
 
         let xDist = indextipX - thumbtipX;
         let yDist = indextipY - thumbtipY;
-        let dist = Math.sqrt(xDist*xDist + yDist*yDist);
+        dist = Math.sqrt(xDist*xDist + yDist*yDist);
         console.log(dist);
+        if (dist < 25) {
+            console.log("That's a pinch!");
+        }
       }
 }
