@@ -12,7 +12,8 @@ let geometry, material, cube;
 let mlModel;
 let predictions = [];
 
-let nose = {};
+let indextip;
+let thumbtip;
 
 let lastXPosition = 100;
 let lastYPosition = 100;
@@ -131,14 +132,17 @@ function findFingers (){
     for (let i = 0; i < predictions.length; i++) {
         // For each pose detected, loop through all the keypoints
         let prediction = predictions[i];
-        let indextip = prediction.annotations.indexFinger[3];
-        let thumbtip = prediction.annotations.thumb[3];
-        console.log(indextip);
-        console.log(thumbtip);
 
+        indextip = prediction.annotations.indexFinger[3];
+        thumbtip = prediction.annotations.thumb[3];
+        let indextipX = indextip[0];
+        let indextipY = indextip[1];
+        let thumbtipX = thumbtip[0];
+        let thumbtipY = thumbtip[1];
 
-        // We calculate the distance between the two points 
-        //let distance = dist(indextip[0], indextip[1], thumbtip[0], thumbtip[1]);
-        //console.log(distance);
+        let xDist = indextipX - thumbtipX;
+        let yDist = indextipY - thumbtipY;
+        let dist = Math.sqrt(xDist*xDist + yDist*yDist);
+        console.log(dist);
       }
 }
