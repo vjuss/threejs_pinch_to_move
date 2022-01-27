@@ -10,7 +10,7 @@ let threeJSDiv;
 let scene, camera, renderer, light;
 let geometry, material, cube;
 let mlModel;
-let poses = [];
+let predictions = [];
 
 let nose = {};
 
@@ -26,7 +26,6 @@ animate();
 // to do THURSDAY: 
 //make it pinch instead of poseNet - let go of object when hand is opened
 //make a better coord conversion system
-
 
 function init(){
 
@@ -54,9 +53,11 @@ function init(){
         minConfidence: 0.5
     } 
 
-    mlModel = ml5.poseNet(video, options, modelReady);
-    mlModel.on("pose", function (results) {
-        poses = results;
+    
+
+    mlModel = ml5.handpose(video, options, modelReady);
+    mlModel.on("predict", function (results) {
+        predictions = results;
 
     });
 
@@ -102,21 +103,18 @@ function init(){
 
  function animate() {
     requestAnimationFrame(animate);
-    findNose(); // this gives us nose xy values now, next: conversion
-    changeX = nose.x - lastXPosition;
-    changeY = nose.y - lastYPosition;
-    let convertedChangeX = changeX * 0.01; // 0.20 may still move cube with 10 units, it's too much
-    let convertedChangeY = changeY * 0.01;
-    console.log(convertedChangeX);
-    console.log(convertedChangeY);
-    //cube.position.x += (convertedChangeX); // 
-    //cube.position.y += (-convertedChangeY);
-    cube.position.x = convertedChangeX; // above with += was not working, fix this
-    cube.position.y = -convertedChangeY;
+    findFingers(); // this gives us nose xy values now, next: conversion
+    // changeX = nose.x - lastXPosition;
+    // changeY = nose.y - lastYPosition;
+    // let convertedChangeX = changeX * 0.01; // 0.20 may still move cube with 10 units, it's too much
+    // let convertedChangeY = changeY * 0.01;
+    // console.log(convertedChangeX);
+    // console.log(convertedChangeY);
+    // cube.position.x = convertedChangeX; // above with += was not working, fix this
+    // cube.position.y = -convertedChangeY;
     renderer.render(scene, camera);
 
 }
-
 
 function onWindowResize() {
     camera.aspect = (window.innerWidth/2) / (window.innerHeight/2);
@@ -129,24 +127,18 @@ function modelReady() {
     console.log("model Loaded");
 }
 
-function findNose (){
-    for (let i = 0; i < poses.length; i++) {
+function findFingers (){
+    for (let i = 0; i < predictions.length; i++) {
         // For each pose detected, loop through all the keypoints
-        let pose = poses[i].pose;
-        for (let j = 0; j < pose.keypoints.length; j++) {
-          // A keypoint is an object describing a body part (like rightArm or leftShoulder)
-          let keypoint = pose.keypoints[j];
-          
-          // Only draw an ellipse is the pose probability is bigger than 0.2
-          if (keypoint.score > 0.2 ) {
-             if (keypoint.part === 'nose'){
-                nose = {
-                    x:keypoint.position.x,
-                    y:keypoint.position.y
-                }
-             } 
-             console.log(nose);
-          }
-        }
+        let prediction = predictions[i];
+        let indextip = prediction.annotations.indexFinger[3];
+        let thumbtip = prediction.annotations.thumb[3];
+        console.log(indextip);
+        console.log(thumbtip);
+
+
+        // We calculate the distance between the two points 
+        //let distance = dist(indextip[0], indextip[1], thumbtip[0], thumbtip[1]);
+        //console.log(distance);
       }
 }
