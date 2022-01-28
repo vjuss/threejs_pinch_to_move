@@ -28,6 +28,7 @@ animate();
 // when pinch, make cube position the same as pinch coordinates
 //save coords to an array or similar
 //when pinch is released, use latest array coords for cube position
+//make video bigger for more intuitive movement
 //DIFFICULT: only make this happen when pinch starts on top of object
 //make a better coord conversion system
 
@@ -108,16 +109,7 @@ function init(){
  function animate() {
     requestAnimationFrame(animate);
     findFingers(); // this gives us thumbtip xy values now, next: conversion if needed
-    changeX = thumbtipX - lastXPosition;
-    changeY = thumbtipY - lastYPosition;
-    //console.log(changeX);
-   // console.log(changeY);
-    let convertedChangeX = changeX * 0.005; // 0.20 may still move cube with 10 units, it's too much
-    let convertedChangeY = changeY * 0.005;
-    console.log(convertedChangeX);
-    console.log(convertedChangeY);
-    cube.position.x = convertedChangeX; // above with += was not working, fix this
-    cube.position.y = -convertedChangeY;
+
 
     renderer.render(scene, camera);
 
@@ -152,6 +144,18 @@ function findFingers (){
        // console.log(dist);
         if (dist < 25) {
             console.log("That's a pinch!");
+            moveCube();
         }
       }
+}
+
+function moveCube() {
+    changeX = thumbtipX - lastXPosition;
+    changeY = thumbtipY - lastYPosition;
+    let convertedChangeX = changeX * 0.005; // 0.20 may still move cube with 10 units, it's too much
+    let convertedChangeY = changeY * 0.005;
+    console.log(convertedChangeX);
+    console.log(convertedChangeY);
+    cube.position.x = convertedChangeX; // above with += was not working, fix this
+    cube.position.y = -convertedChangeY;
 }
