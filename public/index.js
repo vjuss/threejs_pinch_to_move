@@ -12,8 +12,7 @@ let geometry, material, cube;
 let mlModel;
 let predictions = [];
 
-let indextip;
-let thumbtip;
+let indextip, thumbtip, indextipX, indextipY, thumbtipX, thumbtipY;
 let dist;
 
 let lastXPosition = 100;
@@ -25,8 +24,11 @@ let changeY = 1;
 init();
 animate();
 
-// to do THURSDAY: 
-//make it pinch instead of poseNet - let go of object when hand is opened
+// to do FRIDAY: 
+// when pinch, make cube position the same as pinch coordinates
+//save coords to an array or similar
+//when pinch is released, use latest array coords for cube position
+//DIFFICULT: only make this happen when pinch starts on top of object
 //make a better coord conversion system
 
 function init(){
@@ -51,7 +53,7 @@ function init(){
     });
 
     options = { 
-        //flipHorizontal: true,
+        flipHorizontal: true,
         minConfidence: 0.5
     } 
 
@@ -105,15 +107,18 @@ function init(){
 
  function animate() {
     requestAnimationFrame(animate);
-    findFingers(); // this gives us nose xy values now, next: conversion
-    // changeX = nose.x - lastXPosition;
-    // changeY = nose.y - lastYPosition;
-    // let convertedChangeX = changeX * 0.01; // 0.20 may still move cube with 10 units, it's too much
-    // let convertedChangeY = changeY * 0.01;
-    // console.log(convertedChangeX);
-    // console.log(convertedChangeY);
-    // cube.position.x = convertedChangeX; // above with += was not working, fix this
-    // cube.position.y = -convertedChangeY;
+    findFingers(); // this gives us thumbtip xy values now, next: conversion if needed
+    changeX = thumbtipX - lastXPosition;
+    changeY = thumbtipY - lastYPosition;
+    //console.log(changeX);
+   // console.log(changeY);
+    let convertedChangeX = changeX * 0.005; // 0.20 may still move cube with 10 units, it's too much
+    let convertedChangeY = changeY * 0.005;
+    console.log(convertedChangeX);
+    console.log(convertedChangeY);
+    cube.position.x = convertedChangeX; // above with += was not working, fix this
+    cube.position.y = -convertedChangeY;
+
     renderer.render(scene, camera);
 
 }
@@ -136,15 +141,15 @@ function findFingers (){
 
         indextip = prediction.annotations.indexFinger[3];
         thumbtip = prediction.annotations.thumb[3];
-        let indextipX = indextip[0];
-        let indextipY = indextip[1];
-        let thumbtipX = thumbtip[0];
-        let thumbtipY = thumbtip[1];
+        indextipX = indextip[0];
+        indextipY = indextip[1];
+        thumbtipX = thumbtip[0];
+        thumbtipY = thumbtip[1];
 
         let xDist = indextipX - thumbtipX;
         let yDist = indextipY - thumbtipY;
         dist = Math.sqrt(xDist*xDist + yDist*yDist);
-        console.log(dist);
+       // console.log(dist);
         if (dist < 25) {
             console.log("That's a pinch!");
         }
