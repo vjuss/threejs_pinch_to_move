@@ -11,6 +11,7 @@ let scene, camera, renderer, light;
 let geometry, material, cube;
 let mlModel;
 let predictions = [];
+let matColor;
 
 let indextip, thumbtip, indextipX, indextipY, thumbtipX, thumbtipY;
 let dist;
@@ -20,15 +21,14 @@ let lastYPosition = 100;
 let changeX = 1;
 let changeY = 1;
 
+let pinchActive = false; // pinch not active on launch
+
 
 init();
 animate();
 
 // to do FRIDAY: 
-// when pinch, make cube position the same as pinch coordinates
-//save coords to an array or similar
-//when pinch is released, use latest array coords for cube position
-//make video bigger for more intuitive movement
+//make video bigger for more intuitive movement & hide it
 //DIFFICULT: only make this happen when pinch starts on top of object
 //make a better coord conversion system
 
@@ -38,8 +38,8 @@ function init(){
 
     video = document.createElement('video');
     vidDiv = document.getElementById('video');
-    video.setAttribute('width', 255);
-    video.setAttribute('height', 255);
+    video.setAttribute('width', 500);
+    video.setAttribute('height', 500);
     video.autoplay = true;
     vidDiv.appendChild(video);
 
@@ -55,7 +55,7 @@ function init(){
 
     options = { 
         flipHorizontal: true,
-        minConfidence: 0.5
+        detectionConfidence: 0.999
     } 
 
     
@@ -90,14 +90,13 @@ function init(){
     scene.add(light);
 
     geometry = new THREE.BoxGeometry();
+    matColor = new THREE.Color( 0xff0000 );
 
-    material = [
-        new THREE.MeshPhongMaterial({ color: 0xff0000, transparent: true }),
-        new THREE.MeshPhongMaterial({ color: 0x00ff00, transparent: true }),
-        new THREE.MeshPhongMaterial({ color: 0x0000ff, transparent: true })
-    ];
 
-    cube = new THREE.Mesh(geometry, material[0]);
+    material = new THREE.MeshPhongMaterial({ color: matColor, transparent: true });
+    //activeMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00, transparent: true });
+
+    cube = new THREE.Mesh(geometry, material);
     cube.position.x = 0;
     cube.position.y = 0;
     scene.add(cube); // first add to scene to position 0,0,0
@@ -109,8 +108,6 @@ function init(){
  function animate() {
     requestAnimationFrame(animate);
     findFingers(); // this gives us thumbtip xy values now, next: conversion if needed
-
-
     renderer.render(scene, camera);
 
 }
@@ -137,16 +134,21 @@ function findFingers (){
         indextipY = indextip[1];
         thumbtipX = thumbtip[0];
         thumbtipY = thumbtip[1];
+        console.log(indextipX); // shouldnt give values whn hand is not visible, but does: make predictioon threshold 0.99 or so
 
         let xDist = indextipX - thumbtipX;
         let yDist = indextipY - thumbtipY;
         dist = Math.sqrt(xDist*xDist + yDist*yDist);
        // console.log(dist);
-        if (dist < 25) {
+        if (dist < 12) {
             console.log("That's a pinch!");
             moveCube();
+            
         }
-      }
+        else {
+            //cube.material.color.setHex( 0xff0000 ); // color back to red, is noisy though
+        }
+    }
 }
 
 function moveCube() {
@@ -154,8 +156,9 @@ function moveCube() {
     changeY = thumbtipY - lastYPosition;
     let convertedChangeX = changeX * 0.005; // 0.20 may still move cube with 10 units, it's too much
     let convertedChangeY = changeY * 0.005;
-    console.log(convertedChangeX);
-    console.log(convertedChangeY);
-    cube.position.x = convertedChangeX; // above with += was not working, fix this
+   // console.log(convertedChangeX);
+  //  console.log(convertedChangeY);
+    cube.position.x = convertedChangeX; // when pinch stops, this is the location where cube will be dropped 
     cube.position.y = -convertedChangeY;
+    cube.material.color.setHex(0xF2239A); //make pink on pinch
 }
