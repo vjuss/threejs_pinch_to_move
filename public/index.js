@@ -6,7 +6,7 @@ import * as THREE from './vendor/three/build/three.module.js';
 
 let video, vidDiv, options;
 let threeJSDiv;
-let scene, camera, renderer, light;
+let scene, camera, renderer, lightUp, lightFront, lightLeft, lightRight, lightDirectional;
 let geometry, material, cube;
 let mlModel;
 let predictions = [];
@@ -27,7 +27,6 @@ let isPinch = false;
 init();
 animate();
 
-//pinch as a boolean, not noisy
 //DIFFICULT: only make this happen when pinch starts on top of object
 //make a better coord conversion system
 
@@ -50,7 +49,6 @@ function init(){
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(function(stream) {
         video.srcObject = stream;
-        // video.hiddend();
     })
     .catch(function(err) {
         console.log("An error occurred! " + err);
@@ -77,7 +75,7 @@ function init(){
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    //renderer.setSize(1000, 1000);
+    //renderer.setSize(600, 600);
     threeJSDiv = document.getElementById('ThreeJS');
     threeJSDiv.appendChild( renderer.domElement );
 
@@ -89,19 +87,49 @@ function init(){
     );
     camera.position.z = 3;
 
-    light = new THREE.PointLight();
-    light.position.set(10, 10, 10);
-    scene.add(light);
+    lightUp = new THREE.SpotLight();
+    lightUp.castShadow = true;
+    lightUp.position.set(0, 5, 0);
+    scene.add(lightUp);
+
+    lightFront = new THREE.SpotLight({penumbra: 0.5});
+    lightFront.castShadow = true;
+    lightFront.position.set(0, -0.5, 5);
+    //scene.add(lightFront);
+
+    lightLeft = new THREE.SpotLight();
+    lightLeft.castShadow = true;
+    lightLeft.position.set(-5, 0, 0);
+    scene.add(lightLeft);
+
+    lightRight = new THREE.SpotLight();
+    lightRight.castShadow = true;
+    lightRight.position.set(5, 0, 0);
+    scene.add(lightRight);
+
+    lightDirectional = new THREE.DirectionalLight('white', 2);
+    lightDirectional.castShadow = true;
+    lightDirectional.position.set(0, -0.5, 6);
+    scene.add(lightDirectional);
+
+
+
+
+    let ambientLight = new THREE.AmbientLight(0x000000, 6.0);
+    scene.add(ambientLight);
 
     geometry = new THREE.BoxGeometry(0.7, 0.7, 0.7);
     matColor = new THREE.Color( 0xff0000 );
 
-    material = new THREE.MeshPhongMaterial({ color: matColor, transparent: true });
+    //material = new THREE.MeshPhongMaterial({ color: matColor, transparent: true });
+    material = new THREE.MeshStandardMaterial({ color: 0xf6046d, emissive: 0x4a4408, roughness: 0.09, metalness: 0.03 });
     //activeMaterial = new THREE.MeshPhongMaterial({ color: 0x00ff00, transparent: true });
 
     cube = new THREE.Mesh(geometry, material);
     cube.position.x = 0;
-    cube.position.y = 0;
+    cube.position.y = -1.5;
+
+
     scene.add(cube); // first add to scene to position 0,0,0
 
     //markerCube for debugging
@@ -146,17 +174,15 @@ function findFingers (){
         let xDist = indextipX - thumbtipX;
         let yDist = indextipY - thumbtipY;
         dist = Math.sqrt(xDist*xDist + yDist*yDist);
-       // console.log(dist);
         if (dist < 12) {
             console.log("That's a pinch!");
             isPinch = true;
             moveCube();
         }
 
-        else if (dist > 50) {
+        else if (dist > 40) {
             isPinch = false; // def not pinch anymore
             cube.material.color.setHex( 0xff0000 ); // color back to red
-
         }
         else {
             isPinch = true; // still true, fingers remain quite close to each other 
@@ -169,8 +195,8 @@ function findFingers (){
 function moveCube() {
     changeX = thumbtipX - lastXPosition;
     changeY = thumbtipY - lastYPosition;
-    let convertedChangeX = changeX * 0.005; // 0.20 may still move cube with 10 units, it's too much
-    let convertedChangeY = changeY * 0.005;
+    let convertedChangeX = changeX * 0.007; // 0.20 may still move cube with 10 units, it's too much
+    let convertedChangeY = changeY * 0.007; // was 0.005
     console.log(convertedChangeX);
     console.log(convertedChangeY);
     cube.position.x = convertedChangeX; // when pinch stops, this is the location where cube will be dropped 
@@ -182,5 +208,5 @@ function moveCube() {
     let markerCube = new THREE.Mesh(markerGeo, markerMat);
     markerCube.position.x = convertedChangeX;
     markerCube.position.y = -convertedChangeY;
-    scene.add(markerCube);
+    //scene.add(markerCube);
 }
