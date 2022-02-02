@@ -1,7 +1,6 @@
 //most impor5tant bits from from https://github.com/AnnaKap/facefun
 //and https://codepen.io/p5js/pen/apVPVx?editors=1111
 
-
 import * as THREE from './vendor/three/build/three.module.js';
 
 
@@ -20,6 +19,7 @@ let lastXPosition = 100;
 let lastYPosition = 100;
 let changeX = 1;
 let changeY = 1;
+let isPinch = false;
 
 //let pinchActive = false; // pinch not active on launch
 
@@ -27,9 +27,8 @@ let changeY = 1;
 init();
 animate();
 
-
+//pinch as a boolean, not noisy
 //DIFFICULT: only make this happen when pinch starts on top of object
-//frist start by adding marker where the pinch is
 //make a better coord conversion system
 
 //video & three js pairs now: 
@@ -115,7 +114,7 @@ function init(){
 
  function animate() {
     requestAnimationFrame(animate);
-    findFingers(); // this gives us thumbtip xy values now, next: conversion if needed
+    findFingers(); // check finger location constantly
     renderer.render(scene, camera);
 
 }
@@ -150,11 +149,20 @@ function findFingers (){
        // console.log(dist);
         if (dist < 12) {
             console.log("That's a pinch!");
+            isPinch = true;
             moveCube();
         }
-        else {
-            //cube.material.color.setHex( 0xff0000 ); // color back to red, is noisy though
+
+        else if (dist > 50) {
+            isPinch = false; // def not pinch anymore
+            cube.material.color.setHex( 0xff0000 ); // color back to red
+
         }
+        else {
+            isPinch = true; // still true, fingers remain quite close to each other 
+            moveCube();
+        }
+
     }
 }
 
