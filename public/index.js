@@ -177,12 +177,13 @@ function findFingers (){
         if (dist < 12) {
             console.log("That's a pinch!");
             isPinch = true;
+            cube.material.color.setHex( 0xff0000 ); // color to red
             moveCube();
         }
 
         else if (dist > 40) {
             isPinch = false; // def not pinch anymore
-            cube.material.color.setHex( 0xff0000 ); // color back to red
+            cube.material.color.setHex( 0xf6046d ); // color back to pink
         }
         else {
             isPinch = true; // still true, fingers remain quite close to each other 
