@@ -21,7 +21,11 @@ let changeX = 1;
 let changeY = 1;
 let isPinch = false;
 
-//let pinchActive = false; // pinch not active on launch
+//raycasting variables
+
+let normXY = new THREE.Vector2();
+
+
 
 
 init();
@@ -40,8 +44,8 @@ function init(){
 
     video = document.createElement('video');
     vidDiv = document.getElementById('video');
-    video.setAttribute('width', 250);
-    video.setAttribute('height', 250);
+    video.setAttribute('width', 250); // test 320 & 240
+    video.setAttribute('height', 250); 
     video.autoplay = true;
     vidDiv.appendChild(video);
 
@@ -55,7 +59,7 @@ function init(){
     });
 
     options = { 
-        flipHorizontal: true,
+        //flipHorizontal: true,
         detectionConfidence: 0.999
     } 
 
@@ -132,9 +136,6 @@ function init(){
 
     scene.add(cube); // first add to scene to position 0,0,0
 
-    //markerCube for debugging
-
-    //markerCube.position.z = 0.5;
 
     window.addEventListener('resize', onWindowResize, false);
 
@@ -143,6 +144,10 @@ function init(){
  function animate() {
     requestAnimationFrame(animate);
     findFingers(); // check finger location constantly
+
+
+
+
     renderer.render(scene, camera);
 
 }
@@ -178,7 +183,7 @@ function findFingers (){
             console.log("That's a pinch!");
             isPinch = true;
             cube.material.color.setHex( 0xff0000 ); // color to red
-            moveCube();
+            moveCube2();
         }
 
         else if (dist > 40) {
@@ -187,7 +192,7 @@ function findFingers (){
         }
         else {
             isPinch = true; // still true, fingers remain quite close to each other 
-            moveCube();
+            moveCube2();
         }
 
     }
@@ -210,4 +215,27 @@ function moveCube() {
     markerCube.position.x = convertedChangeX;
     markerCube.position.y = -convertedChangeY;
     //scene.add(markerCube);
+}
+
+function moveCube2() {
+
+    //thumbtipX and thumbtipY are xy coords from our tiny video canvas, normXY was an empty vec2
+
+    //formula for normalizing:
+    //pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	//pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+    normXY.x = (thumbtipX / video.width) * 2 - 1;
+    normXY.y = - (thumbtipY / video.height)  * 2 + 1;
+
+    console.log(normXY);
+
+       //range of this is currently, to be fixed (video full screen etc?):
+       //up left x -0.9, y 0.8
+       //up right x 4.0, y 0.8
+       //bottom left x -0.8, y -2.66
+       //bottom right x 3.86, y -2.6 tms
+
+       //then add unproject & raycaster
+
 }
