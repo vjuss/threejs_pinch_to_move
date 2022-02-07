@@ -23,6 +23,8 @@ let changeX = 1;
 let changeY = 1;
 let isPinch = false;
 
+const pointer = new THREE.Vector2();
+
 //raycasting variables
 
 let normXY = new THREE.Vector2();
@@ -43,8 +45,10 @@ function init(){
     video = document.createElement('video');
     vidDiv = document.getElementById('video');
 
-    video.setAttribute('width', window.innerWidth);
-    video.setAttribute('height', window.innerHeight);
+    //video.setAttribute('width', window.innerWidth);
+    //video.setAttribute('height', window.innerHeight);
+    video.setAttribute('width', 640);
+    video.setAttribute('height', 480);
     video.autoplay = true;
     vidDiv.appendChild(video);
 
@@ -64,7 +68,7 @@ function init(){
         //flipHorizontal: true,
         detectionConfidence: 0.999,
         //imageScaleFactor: 0.2,
-        imageScaleFactor: 0.8
+        imageScaleFactor: 0.2
     } 
 
     mlModel = ml5.handpose(video, options, modelReady);
@@ -119,8 +123,6 @@ function init(){
     scene.add(lightDirectional);
 
 
-
-
     let ambientLight = new THREE.AmbientLight(0x000000, 6.0);
     scene.add(ambientLight);
 
@@ -140,6 +142,7 @@ function init(){
 
 
     window.addEventListener('resize', onWindowResize, false);
+    window.addEventListener( 'mousemove', onMouseMove, false );
 
 }
 
@@ -147,6 +150,7 @@ function init(){
     requestAnimationFrame(animate);
     findFingers(); // check finger location constantly
     renderer.render(scene, camera);
+    //onPointerMove();
 
 }
 
@@ -172,7 +176,7 @@ function findFingers (){
         indextipY = indextip[1];
         thumbtipX = thumbtip[0];
         thumbtipY = thumbtip[1];
-        console.log(indextipX); // shouldnt give values whn hand is not visible, but does: make predictioon threshold 0.99 or so
+        //console.log(indextipX); // shouldnt give values whn hand is not visible, but does: make predictioon threshold 0.99 or so
 
         let xDist = indextipX - thumbtipX;
         let yDist = indextipY - thumbtipY;
@@ -181,7 +185,6 @@ function findFingers (){
             console.log("That's a pinch!");
             isPinch = true;
             cube.material.color.setHex( 0xff0000 ); // color to red
-            //moveCube2();
         }
 
         else if (dist > 40) {
@@ -190,13 +193,15 @@ function findFingers (){
         }
         else {
             isPinch = true; // still true, fingers remain quite close to each other 
-           // moveCube2();
         }
         //new from ninja game
 
         handVector.x = ((window.innerWidth - thumbtipX) / window.innerWidth) * 2 - 1;
         handVector.y = -(thumbtipY / window.innerHeight) * 2 + 1;
         handVector.z = 0;
+        console.log(handVector);
+        console.log("ThumbtipX is", thumbtipX); //200-600
+        console.log("ThumbtipY is", thumbtipY); //0-400
 
         let markerGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
         let markerMat = new THREE.MeshPhongMaterial({ color: 0xffffff, transparent: true });
@@ -205,7 +210,7 @@ function findFingers (){
         markerCube.position.y = handVector.y;
         markerCube.position.z = handVector.z;
         scene.add(markerCube);
-        console.log(handVector);
+      
 
         //next add camera pos
         //imagescalefactor check
@@ -233,19 +238,19 @@ function moveCube() {
     //scene.add(markerCube);
 }
 
-function moveCube2() {
+function onMouseMove( event ) {
 
-    //thumbtipX and thumbtipY are xy coords from our tiny video canvas, normXY was an empty vec2
-
-    //formula for normalizing:
-    //pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	//pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-
-    normXY.x = (thumbtipX / video.width) * 2 - 1;
-    normXY.y = - (thumbtipY / video.height)  * 2 + 1;
-
-    console.log(normXY);
+    event.preventDefault();
+    console.log("MouseX", event.clientX);
+    console.log("MouseY", event.clientY); //about 0-900 for both 
 
 
+
+	// calculate pointer position in normalized device coordinates
+	// (-1 to +1) for both components
+
+	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    console.log("Pointer is", pointer);
 
 }
