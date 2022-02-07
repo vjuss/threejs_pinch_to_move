@@ -196,8 +196,11 @@ function findFingers (){
         }
         //new from ninja game
 
-        handVector.x = ((window.innerWidth - thumbtipX) / window.innerWidth) * 2 - 1;
-        handVector.y = -(thumbtipY / window.innerHeight) * 2 + 1;
+        //handVector.x = ((window.innerWidth - thumbtipX) / window.innerWidth) * 2 - 1;
+        //handVector.y = -(thumbtipY / window.innerHeight) * 2 + 1;
+        //handVector.z = 0;
+        handVector.x = ((640 - thumbtipX) / 640) * 2 - 1;
+        handVector.y = -(thumbtipY / 480) * 2 + 1;
         handVector.z = 0;
         console.log(handVector);
         console.log("ThumbtipX is", thumbtipX); //200-600
