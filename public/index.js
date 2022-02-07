@@ -28,11 +28,6 @@ let isPinch = false;
 let normXY = new THREE.Vector2();
 let handVector = new THREE.Vector3();
 
-
-
-
-
-
 init();
 animate();
 
@@ -42,19 +37,17 @@ animate();
 //video & three js pairs now: 
 
 
-
 function init(){
 
     //Video & ML5 init
-
     video = document.createElement('video');
     vidDiv = document.getElementById('video');
-    video.setAttribute('width', window.innerWidth); // test 320 & 240
-    video.setAttribute('height', window.innerHeight); 
+
+    video.setAttribute('width', window.innerWidth);
+    video.setAttribute('height', window.innerHeight);
     video.autoplay = true;
     vidDiv.appendChild(video);
 
-    // get the users webcam stream to render in the video
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(function(stream) {
         video.srcObject = stream;
@@ -63,19 +56,22 @@ function init(){
         console.log("An error occurred! " + err);
     });
 
+    //add image scale thingy for 0.2
+  
+    //settings for ML model
+
     options = { 
         //flipHorizontal: true,
-        detectionConfidence: 0.999
+        detectionConfidence: 0.999,
+        //imageScaleFactor: 0.2,
+        imageScaleFactor: 0.8
     } 
-
-    
 
     mlModel = ml5.handpose(video, options, modelReady);
     mlModel.on("predict", function (results) {
         predictions = results;
 
     });
-
 
     // Three.js init
 
@@ -94,7 +90,8 @@ function init(){
         1,
         1000
     );
-    camera.position.z = 3;
+    camera.position.set(0, 0, 3);
+    scene.add(camera);
 
     lightUp = new THREE.SpotLight();
     lightUp.castShadow = true;
