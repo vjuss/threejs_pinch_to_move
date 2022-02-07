@@ -91,7 +91,7 @@ function init(){
     camera = new THREE.PerspectiveCamera(
         75,
         window.innerWidth / window.innerHeight,
-        0.1,
+        1,
         1000
     );
     camera.position.z = 3;
@@ -195,8 +195,6 @@ function findFingers (){
             isPinch = true; // still true, fingers remain quite close to each other 
            // moveCube2();
         }
-
-
         //new from ninja game
 
         handVector.x = ((window.innerWidth - thumbtipX) / window.innerWidth) * 2 - 1;
@@ -211,6 +209,10 @@ function findFingers (){
         markerCube.position.z = handVector.z;
         scene.add(markerCube);
         console.log(handVector);
+
+        //next add camera pos
+        //imagescalefactor check
+
 
     }
 }
