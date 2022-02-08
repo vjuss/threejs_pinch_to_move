@@ -36,14 +36,14 @@ animate();
 
 function init(){
 
-    //Video & ML5 init
+    //old Video & ML5 init
     video = document.createElement('video');
     vidDiv = document.getElementById('video');
+    vidDiv.width = window.innerWidth;
+    vidDiv.height = window.innerHeight;
 
-    //video.setAttribute('width', window.innerWidth);
-   // video.setAttribute('height', window.innerHeight);
-    video.setAttribute('width', 250);
-    video.setAttribute('height', 250);
+    video.setAttribute('width', 426);
+    video.setAttribute('height', 240);
     video.autoplay = true;
     vidDiv.appendChild(video);
     console.log(video.width);
@@ -51,14 +51,10 @@ function init(){
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(function(stream) {
         video.srcObject = stream;
-    })
-    .catch(function(err) {
-        console.log("An error occurred! " + err);
-    });
-
-    //add image scale thingy for 0.2
-  
-    //settings for ML model
+     })
+     .catch(function(err) {
+         console.log("An error occurred! " + err);
+     });
 
     options = { 
         //flipHorizontal: true,
@@ -196,15 +192,15 @@ function findFingers (){
         //handVector.y = -(thumbtipY / window.innerHeight) * 2 + 1;
         //handVector.z = 0;
    
-        console.log("ThumbtipX is", indextipX); //200-600
-        console.log("ThumbtipY is", indextipY); //0-400
+        //console.log("ThumbtipX is", indextipX); //200-600
+       // console.log("ThumbtipY is", indextipY); //0-400
 
         let translatorX = window.innerWidth / video.width; //gives a decimal like 1.56 to use to translate the hand coords to full screen
         let translatorY = window.innerHeight / video.height;
         let translateFingerTipX = indextipX * translatorX;
         let translateFingerTipY = indextipY * translatorY;
-        console.log("Translated tip is", translateFingerTipX);
-        console.log("Translated tip is", translateFingerTipY);
+       // console.log("Translated tip is", translateFingerTipX);
+       // console.log("Translated tip is", translateFingerTipY);
 
         //edit these next to use full screen and new coords
         // handVector.x = ((video.width - thumbtipX) / video.width) * 2 - 1;
