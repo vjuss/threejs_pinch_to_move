@@ -215,6 +215,8 @@ function findFingers (){
         handVector.y = -(translateFingerTipY / window.innerHeight) * 2 + 1;
         handVector.z = 0;
         console.log(handVector);
+
+        //next: add video in the middle of the screen in css (translate)
     
 
         let markerGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
@@ -224,8 +226,6 @@ function findFingers (){
         markerCube.position.y = handVector.y;
         markerCube.position.z = handVector.z;
         scene.add(markerCube);
-        //next add camera pos
-        //imagescalefactor check
 
     }
 }
