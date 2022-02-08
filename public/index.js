@@ -33,11 +33,6 @@ let handVector = new THREE.Vector3();
 init();
 animate();
 
-//DIFFICULT: only make this happen when pinch starts on top of object
-//make a better coord conversion system
-
-//video & three js pairs now: 
-
 
 function init(){
 
@@ -46,11 +41,12 @@ function init(){
     vidDiv = document.getElementById('video');
 
     //video.setAttribute('width', window.innerWidth);
-    //video.setAttribute('height', window.innerHeight);
-    video.setAttribute('width', 640);
-    video.setAttribute('height', 480);
+   // video.setAttribute('height', window.innerHeight);
+    video.setAttribute('width', 250);
+    video.setAttribute('height', 250);
     video.autoplay = true;
     vidDiv.appendChild(video);
+    console.log(video.width);
 
     navigator.mediaDevices.getUserMedia({ video: true, audio: false })
     .then(function(stream) {
@@ -68,7 +64,7 @@ function init(){
         //flipHorizontal: true,
         detectionConfidence: 0.999,
         //imageScaleFactor: 0.2,
-        imageScaleFactor: 0.2
+        imageScaleFactor: 0.5
     } 
 
     mlModel = ml5.handpose(video, options, modelReady);
@@ -199,12 +195,27 @@ function findFingers (){
         //handVector.x = ((window.innerWidth - thumbtipX) / window.innerWidth) * 2 - 1;
         //handVector.y = -(thumbtipY / window.innerHeight) * 2 + 1;
         //handVector.z = 0;
-        handVector.x = ((640 - thumbtipX) / 640) * 2 - 1;
-        handVector.y = -(thumbtipY / 480) * 2 + 1;
+   
+        console.log("ThumbtipX is", indextipX); //200-600
+        console.log("ThumbtipY is", indextipY); //0-400
+
+        let translatorX = window.innerWidth / video.width; //gives a decimal like 1.56 to use to translate the hand coords to full screen
+        let translatorY = window.innerHeight / video.height;
+        let translateFingerTipX = indextipX * translatorX;
+        let translateFingerTipY = indextipY * translatorY;
+        console.log("Translated tip is", translateFingerTipX);
+        console.log("Translated tip is", translateFingerTipY);
+
+        //edit these next to use full screen and new coords
+        // handVector.x = ((video.width - thumbtipX) / video.width) * 2 - 1;
+        // handVector.y = -(thumbtipY / video.height) * 2 + 1;
+        // handVector.z = 0;
+
+        handVector.x = (translateFingerTipX / window.innerWidth) * 2 - 1;
+        handVector.y = -(translateFingerTipY / window.innerHeight) * 2 + 1;
         handVector.z = 0;
         console.log(handVector);
-        console.log("ThumbtipX is", thumbtipX); //200-600
-        console.log("ThumbtipY is", thumbtipY); //0-400
+    
 
         let markerGeo = new THREE.BoxGeometry(0.1, 0.1, 0.1);
         let markerMat = new THREE.MeshPhongMaterial({ color: 0xffffff, transparent: true });
@@ -213,11 +224,8 @@ function findFingers (){
         markerCube.position.y = handVector.y;
         markerCube.position.z = handVector.z;
         scene.add(markerCube);
-      
-
         //next add camera pos
         //imagescalefactor check
-
 
     }
 }
@@ -252,8 +260,8 @@ function onMouseMove( event ) {
 	// calculate pointer position in normalized device coordinates
 	// (-1 to +1) for both components
 
-	pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-	pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
-    console.log("Pointer is", pointer);
+	//pointer.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+	//pointer.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+    //console.log("Pointer is", pointer);
 
 }
